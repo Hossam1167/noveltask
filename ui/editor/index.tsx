@@ -33,6 +33,40 @@ export default function Editor() {
     }, 500);
   }, 750);
 
+  // Get selected text for re-write option
+  const textRef = useRef(null);
+
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+
+  console.log("is Selected", isSelecting);
+  console.log("Selected text", selectedText);
+
+  const handleKeyDown = (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "a") {
+      event.preventDefault(); // Prevent default browser text selection behavior
+      const allText = window.getSelection().toString();
+      setSelectedText(allText);
+    }
+  };
+
+  const handleMouseDown = () => {
+    setIsSelecting(true);
+    setSelectedText("");
+  };
+
+  const handleMouseUp = () => {
+    setIsSelecting(false);
+    const selected = window.getSelection().toString();
+    setSelectedText(selected);
+  };
+
+  const handleMouseLeave = () => {
+    setIsSelecting(false);
+  };
+
+  // End re-write
+
   const editor = useEditor({
     extensions: TiptapExtensions,
     editorProps: TiptapEditorProps,
@@ -137,6 +171,12 @@ export default function Editor() {
         editor?.chain().focus().run();
       }}
       className="relative min-h-[500px] w-full max-w-screen-lg border-stone-200 bg-white p-12 px-8 sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:px-12 sm:shadow-lg"
+      ref={textRef}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={handleMouseDown}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
     >
       <div className="absolute right-5 top-5 mb-5 rounded-lg bg-stone-100 px-2 py-1 text-sm text-stone-400">
         {saveStatus}
