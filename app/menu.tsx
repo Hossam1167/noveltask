@@ -17,6 +17,7 @@ import {
   Wand2,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { NextResponse } from "next/server";
 
 const fonts = [
   {
@@ -55,8 +56,28 @@ const reWrite = [
 ];
 
 export default function Menu() {
-  const { font: currentFont, setFont } = useContext(AppContext);
+  const { font: currentFont, setFont, selectedText } = useContext(AppContext);
   const { theme: currentTheme, setTheme } = useTheme();
+
+  const handelRewrite = async () => {
+    try {
+      const request = await fetch("./api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: selectedText }),
+      });
+
+      if (!request.ok) {
+        throw new Error("Network response was not Ok ");
+      }
+
+      const { res } = await request.json();
+      return console.log(res);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
 
   return (
     <Popover>
@@ -112,7 +133,7 @@ export default function Menu() {
             <button
               key={idx}
               className="flex w-full items-center justify-between rounded px-2 py-1.5 text-sm text-stone-600 hover:bg-stone-100"
-              onClick={() => {}}
+              onClick={handelRewrite}
             >
               <div className="flex items-center space-x-2">
                 <div className="rounded-sm border border-stone-200 p-1">

@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { TiptapEditorProps } from "./props";
 import { TiptapExtensions } from "./extensions";
 import useLocalStorage from "@/lib/hooks/use-local-storage";
 import { useDebouncedCallback } from "use-debounce";
-import { useCompletion } from "ai/react";
+import { useCompletion, useChat } from "ai/react";
 import { toast } from "sonner";
 import va from "@vercel/analytics";
 import DEFAULT_EDITOR_CONTENT from "./default-content";
 import { EditorBubbleMenu } from "./components/bubble-menu";
 import { getPrevText } from "@/lib/editor";
 import { ImageResizer } from "./components/image-resizer";
+import { AppContext } from "@/app/providers";
 
 export default function Editor() {
   const [content, setContent] = useLocalStorage(
@@ -34,13 +35,16 @@ export default function Editor() {
   }, 750);
 
   // Get selected text for re-write option
+  const { selectedText, setSelectedText } = useContext(AppContext);
   const textRef = useRef(null);
+  const { messages } = useChat();
 
   const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedText, setSelectedText] = useState("");
 
   console.log("is Selected", isSelecting);
   console.log("Selected text", selectedText);
+  console.log("Selected Ref", textRef);
+  console.log("messages", messages);
 
   const handleKeyDown = (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "a") {
@@ -183,7 +187,7 @@ export default function Editor() {
       </div>
       {editor && <EditorBubbleMenu editor={editor} />}
       {editor?.isActive("image") && <ImageResizer editor={editor} />}
-      <EditorContent editor={editor} />
+      <EditorContent editor={editor} ref={textRef} />
     </div>
   );
 }

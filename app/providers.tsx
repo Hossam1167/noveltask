@@ -1,6 +1,12 @@
 "use client";
 
-import { Dispatch, ReactNode, SetStateAction, createContext } from "react";
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useState,
+} from "react";
 import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
@@ -11,9 +17,13 @@ import { cn } from "@/lib/utils";
 export const AppContext = createContext<{
   font: string;
   setFont: Dispatch<SetStateAction<string>>;
+  selectedText: string;
+  setSelectedText: Dispatch<SetStateAction<string>>;
 }>({
   font: "Default",
   setFont: () => {},
+  selectedText: "",
+  setSelectedText: () => {},
 });
 
 const ToasterProvider = () => {
@@ -25,6 +35,7 @@ const ToasterProvider = () => {
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [font, setFont] = useLocalStorage<string>("novel__font", "Default");
+  const [selectedText, setSelectedText] = useState<string>();
 
   return (
     <ThemeProvider
@@ -38,6 +49,8 @@ export default function Providers({ children }: { children: ReactNode }) {
         value={{
           font,
           setFont,
+          selectedText,
+          setSelectedText,
         }}
       >
         <ToasterProvider />
