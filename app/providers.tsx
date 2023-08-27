@@ -19,11 +19,15 @@ export const AppContext = createContext<{
   setFont: Dispatch<SetStateAction<string>>;
   selectedText: string;
   setSelectedText: Dispatch<SetStateAction<string>>;
+  aiResponse: string;
+  setAiResponse: Dispatch<SetStateAction<string>>;
 }>({
   font: "Default",
   setFont: () => {},
   selectedText: "",
   setSelectedText: () => {},
+  aiResponse: "",
+  setAiResponse: () => {},
 });
 
 const ToasterProvider = () => {
@@ -36,6 +40,7 @@ const ToasterProvider = () => {
 export default function Providers({ children }: { children: ReactNode }) {
   const [font, setFont] = useLocalStorage<string>("novel__font", "Default");
   const [selectedText, setSelectedText] = useState<string>();
+  const [aiResponse, setAiResponse] = useState<string>();
 
   return (
     <ThemeProvider
@@ -51,6 +56,8 @@ export default function Providers({ children }: { children: ReactNode }) {
           setFont,
           selectedText,
           setSelectedText,
+          aiResponse,
+          setAiResponse,
         }}
       >
         <ToasterProvider />

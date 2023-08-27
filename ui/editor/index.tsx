@@ -6,7 +6,7 @@ import { TiptapEditorProps } from "./props";
 import { TiptapExtensions } from "./extensions";
 import useLocalStorage from "@/lib/hooks/use-local-storage";
 import { useDebouncedCallback } from "use-debounce";
-import { useCompletion, useChat } from "ai/react";
+import { useCompletion } from "ai/react";
 import { toast } from "sonner";
 import va from "@vercel/analytics";
 import DEFAULT_EDITOR_CONTENT from "./default-content";
@@ -37,36 +37,25 @@ export default function Editor() {
   // Get selected text for re-write option
   const { selectedText, setSelectedText } = useContext(AppContext);
   const textRef = useRef(null);
-  const { messages } = useChat();
 
-  const [isSelecting, setIsSelecting] = useState(false);
-
-  console.log("is Selected", isSelecting);
   console.log("Selected text", selectedText);
   console.log("Selected Ref", textRef);
-  console.log("messages", messages);
 
   const handleKeyDown = (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "a") {
-      event.preventDefault(); // Prevent default browser text selection behavior
+      event.preventDefault();
       const allText = window.getSelection().toString();
       setSelectedText(allText);
     }
   };
 
   const handleMouseDown = () => {
-    setIsSelecting(true);
     setSelectedText("");
   };
 
   const handleMouseUp = () => {
-    setIsSelecting(false);
     const selected = window.getSelection().toString();
     setSelectedText(selected);
-  };
-
-  const handleMouseLeave = () => {
-    setIsSelecting(false);
   };
 
   // End re-write
@@ -177,7 +166,6 @@ export default function Editor() {
       className="relative min-h-[500px] w-full max-w-screen-lg border-stone-200 bg-white p-12 px-8 sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:px-12 sm:shadow-lg"
       ref={textRef}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
       tabIndex={0}

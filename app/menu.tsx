@@ -17,7 +17,6 @@ import {
   Wand2,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { NextResponse } from "next/server";
 
 const fonts = [
   {
@@ -56,26 +55,40 @@ const reWrite = [
 ];
 
 export default function Menu() {
-  const { font: currentFont, setFont, selectedText } = useContext(AppContext);
+  const {
+    font: currentFont,
+    setFont,
+    selectedText,
+    setAiResponse,
+  } = useContext(AppContext);
   const { theme: currentTheme, setTheme } = useTheme();
 
   const handelRewrite = async () => {
     try {
-      const request = await fetch("./api/generate", {
+      const response = await fetch("./api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: selectedText }),
       });
 
-      if (!request.ok) {
+      if (!response.ok) {
         throw new Error("Network response was not Ok ");
       }
-
-      const { res } = await request.json();
-      return console.log(res);
+      const data = response.body;
+      if (!data) {
+        return;
+      }
+      const reader = data.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value);
+        setAiResponse((prev) => prev + chunkValue);
+      }
     } catch (err) {
       console.log(err);
-      throw err;
     }
   };
 
