@@ -35,7 +35,7 @@ export default function Editor() {
   }, 750);
 
   // Get selected text for re-write option
-  const { selectedText, setSelectedText } = useContext(AppContext);
+  const { selectedText, setSelectedText, aiResponse } = useContext(AppContext);
   const textRef = useRef(null);
 
   console.log("Selected text", selectedText);
@@ -63,6 +63,7 @@ export default function Editor() {
   const editor = useEditor({
     extensions: TiptapExtensions,
     editorProps: TiptapEditorProps,
+
     onUpdate: (e) => {
       setSaveStatus("Unsaved");
       const selection = e.editor.state.selection;
@@ -157,6 +158,16 @@ export default function Editor() {
       setHydrated(true);
     }
   }, [editor, content, hydrated]);
+
+  useEffect(() => {
+    if (aiResponse) {
+      editor?.state.doc.textBetween(
+        Math.max(0, editor.state.selection.from),
+        editor.state.selection.from - selectedText?.length,
+        "\n",
+      );
+    }
+  }, [aiResponse, editor, selectedText]);
 
   return (
     <div

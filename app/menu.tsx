@@ -17,6 +17,12 @@ import {
   Wand2,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useCompletion } from "ai/react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import { TiptapEditorProps } from "../ui/editor/props";
+import { TiptapExtensions } from "../ui/editor/extensions";
+import { toast } from "sonner";
+import { getPrevText } from "@/lib/editor";
 
 const fonts = [
   {
@@ -59,13 +65,15 @@ export default function Menu() {
     font: currentFont,
     setFont,
     selectedText,
+    setSelectedText,
     setAiResponse,
+    aiResponse,
   } = useContext(AppContext);
   const { theme: currentTheme, setTheme } = useTheme();
 
   const handelRewrite = async () => {
     try {
-      const response = await fetch("./api/generate", {
+      const response = await fetch("./api/rewrite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: selectedText }),
@@ -85,13 +93,57 @@ export default function Menu() {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value);
-        setAiResponse((prev) => prev + chunkValue);
+        setAiResponse((prev) => prev?.replace("undefined", "") + chunkValue);
       }
     } catch (err) {
       console.log(err);
     }
+    console.log("AI response", aiResponse);
+    setSelectedText(aiResponse);
   };
 
+  const editor = useEditor({
+    extensions: TiptapExtensions,
+    editorProps: TiptapEditorProps,
+  });
+
+  /* const { complete, isLoading } = useCompletion({
+    id: "novel",
+    api: "/api/rewrite",
+    onResponse: (response) => {
+      if (response.status === 429) {
+        toast.error("You have reached your request limit for the day.");
+
+        return;
+      }
+      editor
+        .chain()
+        .focus()
+        .deleteRange({
+          from: editor.state.selection.from - 2,
+          to: editor.state.selection.from,
+        })
+        .run();
+    },
+    onFinish: (_prompt, completion) => {
+      // highlight the generated text
+      editor.commands.setTextSelection({
+        from: editor.state.selection.from,
+        to: editor.state.selection.from + completion.length,
+      });
+    },
+    onError: () => {
+      toast.error("Something went wrong.");
+    },
+  });
+  const handelrewrite = () => {
+    complete(
+      getPrevText(editor, {
+        chars: 5000,
+        offset: 1,
+      }),
+    );
+  }; */
   return (
     <Popover>
       <PopoverTrigger className="absolute bottom-5 right-5 z-10 flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-stone-100 active:bg-stone-200 sm:bottom-auto sm:top-5">

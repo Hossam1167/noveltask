@@ -23,6 +23,7 @@ import {
   Image as ImageIcon,
   Code,
   CheckSquare,
+  Wand2,
 } from "lucide-react";
 import LoadingCircle from "@/ui/icons/loading-circle";
 import { toast } from "sonner";
@@ -79,6 +80,12 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       description: "Use AI to expand your thoughts.",
       searchTerms: ["gpt"],
       icon: <Magic className="w-7" />,
+    },
+    {
+      title: "Re-write",
+      description: "Use AI to re-write your text.",
+      searchTerms: ["gpt"],
+      icon: <Wand2 className="w-7" />,
     },
     {
       title: "Send Feedback",
